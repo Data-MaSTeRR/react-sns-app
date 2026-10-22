@@ -5,12 +5,21 @@ import { useState } from "react";
 import { useSignInWithPassword } from "@/hooks/mutations/use-sign-in-with-password.ts";
 import githubIcon from "@/assets/github-mark.svg";
 import { signInWithOAuth } from "@/api/auth.ts";
+import { toast } from "sonner";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { mutate: signInWithPassword } = useSignInWithPassword();
+  const { mutate: signInWithPassword } = useSignInWithPassword({
+    onError: (error) => {
+      toast.error(error.message, {
+        position: "top-center",
+      });
+
+      setPassword("");
+    },
+  });
 
   const handleSignInWithPasswordClick = () => {
     if (email.trim() === "") return;
@@ -28,14 +37,16 @@ export default function SignInPage() {
       <div className="text-xl font-bold">로그인</div>
       <div className="flex flex-col gap-2">
         <Input
-          name={email}
+          name="email"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="py-6"
           type="email"
           placeholder="이메일"
         />
         <Input
-          name={password}
+          name="password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="py-6"
           type="password"
